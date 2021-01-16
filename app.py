@@ -13,7 +13,6 @@ from sqlalchemy.exc import IntegrityError
 app = Flask(__name__)
 app.config.from_object(os.environ["APP_SETTINGS"])
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_COMMIT_ON_TEARDOWN"] = True
 
 api = Api(app)
 
@@ -52,6 +51,8 @@ class User(db.Model):
 
 @auth.verify_password
 def verify_password(username_or_token, password):
+    if not username_or_token:
+        return False
     user = User.verify_auth_token(username_or_token)
     if not user:
         user = User.query.filter_by(username=username_or_token).first()
